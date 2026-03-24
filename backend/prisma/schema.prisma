@@ -1,0 +1,111 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  OPERATOR
+  PASSENGER
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  role          Role
+  passwordHash String
+
+  buses         Bus[]    @relation("OperatorBuses")
+  bookings      Booking[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Bus {
+  id           String @id @default(cuid())
+  plateNumber String @unique
+  capacity     Int
+
+  operatorId String
+  operator   User   @relation("OperatorBuses", fields: [operatorId], references: [id], onDelete: Cascade)
+
+  trips Trip[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Route {
+  id          String @id @default(cuid())
+  origin      String
+  destination String
+
+  trips Trip[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([origin, destination])
+}
+
+model Trip {
+  id String @id @default(cuid())
+
+  routeId        String
+  busId          String
+  departureTime DateTime
+
+  route Route @relation(fields: [routeId], references: [id], onDelete: Restrict)
+  bus   Bus   @relation(fields: [busId], references: [id], onDelete: Restrict)
+
+  bookings Booking[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([departureTime])
+}
+
+model Booking {
+  id String @id @default(cuid())
+
+  userId     String
+  tripId     String
+  seatNumber Int
+
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Restrict)
+
+  payment Payment?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([tripId, seatNumber])
+  @@index([userId])
+}
+
+model Payment {
+  id String @id @default(cuid())
+
+  bookingId String @unique
+  amount    Int
+  status     PaymentStatus @default(PENDING)
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
