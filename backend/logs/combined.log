@@ -1,0 +1,2 @@
+{"level":"info","message":"SmartTransitKE API listening on port 3000 in development mode","service":"smart-transit-ke","timestamp":"2026-04-13 09:13:01"}
+{"level":"info","message":"::1 - - [13/Apr/2026:06:13:48 +0000] \"POST /auth/register HTTP/1.1\" 400 157 \"-\" \"Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.19041.6456\"","service":"smart-transit-ke","timestamp":"2026-04-13 09:13:48"}

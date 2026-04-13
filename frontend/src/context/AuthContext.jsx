@@ -37,7 +37,7 @@ export function AuthProvider({ children }) {
     setAuthError("");
     try {
       const res = await api.post("/auth/login", { email, password });
-      setToken(res.data.token);
+      setToken(res.data.accessToken || res.data.token);
       setUser(res.data.user);
       return { ok: true };
     } catch (err) {
@@ -53,9 +53,9 @@ export function AuthProvider({ children }) {
     setAuthLoading(true);
     setAuthError("");
     try {
-      const res = await api.post("/auth/register", { name, email, password, role: "PASSENGER" });
+      const res = await api.post("/auth/register", { name, email, password, role: "CUSTOMER" });
       // backend returns {token, user}
-      setToken(res.data.token);
+      setToken(res.data.accessToken || res.data.token);
       setUser(res.data.user);
       return { ok: true };
     } catch (err) {
